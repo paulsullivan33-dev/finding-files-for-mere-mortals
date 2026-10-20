@@ -1,0 +1,101 @@
+Finding files commands — the everyday set
+from "Finding Files for Mere Mortals"
+====================================================================
+
+Every output quoted in the guide was captured
+from GNU findutils 4.9.0 (find and xargs),
+against the specimen tree built by
+build-tree.sh (see lab-notes.txt).
+
+
+THE WALK
+--------------------
+    find tree                   every entry, walk order
+    find tree -type f           files only (d dirs, l links)
+    find                        no path means: start at .
+    find file                   a starting point may be a file
+
+
+NAMES
+--------------------
+    find tree -name '*.txt'     basename matches the glob
+                                (QUOTE the pattern, always)
+    find tree -iname '*.txt'    same, ignoring case
+    find tree -path '*/photos/*'  the whole path matches
+    find tree -name '.*'        dotfiles, by name
+
+
+SIZE (units round UP — chapter 3)
+--------------------
+    find tree -size +1M         bigger than 1 MiB, honestly:
+                                strictly over 1048576 bytes
+                                after rounding
+    find tree -size -1M         rounds to zero units:
+                                empty files only
+    find tree -size 1048576c    c is bytes: exact counts
+    find tree -size +100k       see the man page for w k M G
+
+
+TIME (days are whole days — chapter 4)
+--------------------
+    find tree -mmin -60         modified under an hour ago
+    find tree -mtime 1          modified 24–48 hours ago:
+                                the fraction is discarded
+    find tree -mtime +365       over a year old
+    find tree -newer marker     newer than that file
+
+
+OWNERS AND PERMISSIONS
+--------------------
+    find tree -user paul        owned by paul
+    find tree -not -user paul   owned by anyone else
+    find tree -type f -perm -0002   world-writable files
+    find tree -type f -perm /6000   setuid or setgid files
+    find tree -type f -perm 600     exactly these bits
+
+
+COMBINING (AND binds tighter than OR)
+--------------------
+    find tree -type f -name '*.log'     side by side is AND
+    find tree -name '*.jpg' -o -name '*.md'    -o is OR
+    find tree \( -name '*.txt' -o -name '*.md' \) -print
+                                parentheses group it, and
+                                -print then covers both
+
+
+DEPTH AND PRUNING
+--------------------
+    find tree -maxdepth 2       do not descend past level 2
+    find tree -mindepth 1       skip the starting point itself
+    find tree -path 'tree/cache' -prune -o -type f -print
+                                skip cache/ entirely; the -o
+                                and the -print placement are
+                                both load-bearing
+
+
+ACTIONS (print first, act second — chapter 8)
+--------------------
+    find tree -name '*.tmp' -print      the rehearsal
+    find tree -name '*.tmp' -ls         details, not just names
+    find tree -name '*.tmp' -exec echo {} \;    one run per file
+    find tree -name '*.tmp' -exec echo {} +     batched runs
+    find tree -name '*.tmp' -ok rm {} \;  ask me each time
+    find copy -name '*.tmp' -delete     copies only, ever
+
+
+XARGS
+--------------------
+    find tree -print0 | xargs -0 cmd    THE safe pair: NUL is
+                                        the separator no
+                                        filename can contain
+    seq 100 | xargs -n 10 echo  at most 10 arguments per run
+    seq 100 | xargs -I{} echo '[{}]'    one item per run,
+                                        substituted anywhere
+
+
+RECIPES
+--------------------
+    find tree -type f -printf '%s %p\n' | sort -rn | head
+                                largest files (apparent size)
+    find tree -empty            zero-byte files, empty dirs
+    find tree -xtype l          broken symlinks

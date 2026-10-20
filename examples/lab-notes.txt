@@ -1,0 +1,102 @@
+The lab — what the specimen tree is
+====================================================================
+
+The lab is a tree, not a file. Build it with
+the script next to this note:
+
+    sh build-tree.sh tree
+
+Every name in the tree is invented and every
+size and age is deliberate. Rebuild it any
+time — the script deletes and recreates its
+one directory — and rebuild it before the
+time chapter if it has been sitting around,
+because the time specimens are aged relative
+to the moment the script runs. One warning:
+never point the script at a directory you
+care about. It owns the directory it builds.
+
+tree/ — 51 entries: 39 files, 10 directories,
+2 symlinks
+
+Top level
+    notes.txt, Notes.TXT     the same extension
+                             in two cases; case
+                             is chapter 2's lesson
+    report.md, data.csv      ordinary specimens
+    .hidden.txt              a dotfile
+    empty.txt                zero bytes
+    meeting notes.txt        a space in the name
+    o'brien.txt              an apostrophe in the
+                             name — chapters 2 and
+                             9 both spring traps
+                             on these two names
+    big.log                  2,500,000 bytes and
+                             sparse: it occupies
+                             almost no disk, which
+                             is chapter 3's point
+    link-good                a symlink whose
+                             target exists
+    link-broken              a symlink whose
+                             target does not
+    emptydir/                a directory with
+                             nothing in it
+
+archive/
+    recent.log, old.log (mtime 2023-06-15),
+    ancient.log (mtime 2021-03-04) — the
+    cleanup recipe's prey, chapter 10
+
+cache/
+    junk1.tmp, junk2.tmp — the only files the
+    prune in chapter 7 exists to skip, and
+    the -delete rehearsal's targets in
+    chapter 8
+
+photos/
+    img1.jpg, img2.JPG, and raw/img3.CR2 one
+    level deeper — depth is chapter 7's
+    lesson, case is chapter 2's
+
+sizes/
+    Eleven files of exact byte counts:
+    0, 1, 511, 512, 513, 1023, 1024, 1025,
+    1536, 1048576 (exactly 1 MiB), and
+    1048577 (one byte over). Chapter 3's
+    rounding lessons are proven against
+    these boundaries and no others.
+
+subdir/
+    nested.txt — one file one level down, so
+    a shallow search has something to miss
+
+times/
+    fresh.txt (just built), halfhour.txt
+    (30 minutes old), marker.txt (2 hours
+    old, the -newer reference), yesterday.txt
+    (25 hours), twodays.txt (49 hours) —
+    chapter 4's whole cast
+
+perms/
+    normal.txt (644), secret.txt (600),
+    world-writable.txt (666), setuid.sh
+    (4755, a specimen — never run it), and
+    not-mine.txt, which the script tries to
+    give to user 65534 (nobody). That last
+    step needs a cooperative filesystem and
+    root; where it is refused, the file
+    simply stays the builder's, and
+    chapter 5 explains and demonstrates
+    -user on a two-file detour instead.
+
+Things the guide asks you to create
+----------------------------------
+    tree-del/     a second copy of the tree,
+                  made by chapter 8 with
+                  build-tree.sh, so -delete
+                  can be practised on files
+                  whose loss costs nothing.
+                  Chapter 10 makes another.
+    globtrap/     a two-file directory built
+                  by hand in chapter 2, for
+                  the one-match glob trap.

@@ -1,0 +1,25 @@
+site_name: Finding Files for Mere Mortals
+site_description: Plain-language finding of files. Searching a tree by name, type, size, age, owner, and permissions with find, combining tests, acting on results safely with actions and xargs, practised on a specimen tree with hostile filenames.
+site_url: https://paulsullivan33-dev.github.io/finding-files-for-mere-mortals/
+
+# Guides live at the repo root (nice for GitHub browsing).
+# The deploy workflow copies them into docs/ before building.
+theme:
+  name: material
+
+nav:
+  - Home: index.md
+  - What Finding Files Is: what-finding-files-is.md
+  - Names and Types: names-and-types.md
+  - Size and Rounding: size-and-rounding.md
+  - Time and Ages: time-and-ages.md
+  - Owners and Permissions: owners-and-permissions.md
+  - Combining Tests: combining-tests.md
+  - Depth and Pruning: depth-and-pruning.md
+  - Actions: actions.md
+  - xargs: xargs.md
+  - Recipes: recipes.md
+  - The Neighbours: the-neighbours.md
+  - Troubleshooting: troubleshooting.md
+  - Glossary: glossary.md
+  - Writing Criteria: criteria.md
