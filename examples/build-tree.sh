@@ -35,7 +35,9 @@ home=$(cd -- "$HOME" && pwd -P) || exit 1
 for protected in "$cwd" "$script_dir" "$home"; do
   case "$protected/" in "$DIR/"*) fail "protected directory $DIR" ;; esac
 done
-marker="$DIR/.mere-mortals-fixture"
+# The marker sits beside the tree, not inside it, so the tree's own
+# contents stay exactly what the guide's chapters describe.
+marker="$DIR.mere-mortals-fixture"
 if [ -e "$DIR" ]; then
   [ -d "$DIR" ] && [ ! -L "$marker" ] && [ -f "$marker" ] || fail "existing unowned target $DIR"
   [ "$(cat -- "$marker")" = "finding-files-for-mere-mortals:v1" ] || fail "wrong ownership marker in $DIR"
@@ -46,6 +48,9 @@ lock="$DIR.build-lock"
 mkdir -- "$lock" 2>/dev/null || fail "build already active (or stale lock): $lock"
 trap 'rmdir -- "$lock"' EXIT
 trap 'exit 1' HUP INT TERM
+# The marker certifies a completed build only: clear it before rebuilding,
+# so an interrupted build leaves an unmarked tree the next run refuses.
+rm -f -- "$marker"
 [ ! -e "$DIR" ] || rm -rf -- "$DIR"
 mkdir -p "$DIR"/archive "$DIR"/cache "$DIR"/photos/raw \
          "$DIR"/sizes "$DIR"/subdir "$DIR"/times "$DIR"/perms \

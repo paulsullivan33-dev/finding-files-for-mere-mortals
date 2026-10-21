@@ -42,15 +42,23 @@ class FixtureSafetyTests(unittest.TestCase):
     def test_wrong_ownership_marker_is_rejected(self):
         target = self.cwd / 'wrong'
         target.mkdir()
-        (target / '.mere-mortals-fixture').write_text('another-project:v1\n', encoding='utf-8')
+        (self.cwd / 'wrong.mere-mortals-fixture').write_text('another-project:v1\n', encoding='utf-8')
         self.assertNotEqual(self.build('wrong').returncode, 0)
-        self.assertTrue((target / '.mere-mortals-fixture').exists())
+        self.assertTrue((self.cwd / 'wrong.mere-mortals-fixture').exists())
+
+    def test_marker_lives_outside_the_tree(self):
+        # The chapters print exact find counts for the tree, so the
+        # ownership marker must never become one of its entries.
+        first = self.build('tree')
+        self.assertEqual(first.returncode, 0, first.stderr)
+        self.assertFalse((self.cwd / 'tree' / '.mere-mortals-fixture').exists())
+        self.assertTrue((self.cwd / 'tree.mere-mortals-fixture').is_file())
 
     def test_new_tree_and_owned_rebuild_succeed_with_spaces(self):
         target = self.cwd / 'owned lab'
         first = self.build('owned lab')
         self.assertEqual(first.returncode, 0, first.stderr)
-        self.assertTrue((target / '.mere-mortals-fixture').is_file())
+        self.assertTrue((self.cwd / 'owned lab.mere-mortals-fixture').is_file())
         (target / 'stale.txt').write_text('old fixture', encoding='utf-8')
         second = self.build('owned lab')
         self.assertEqual(second.returncode, 0, second.stderr)
