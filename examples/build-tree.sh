@@ -19,12 +19,34 @@
 set -eu
 
 DIR=${1:-tree}
-
-case $DIR in
-  ""|"/"|"."|"..") echo "refusing to build in '$DIR'" >&2; exit 1 ;;
-esac
-
-rm -rf "$DIR"
+fail() { printf '%s\n' "refusing fixture target: $*" >&2; exit 1; }
+# Resolve the existing parent, never follow a target symlink, and require an
+# ownership marker before replacing any existing directory.
+case $DIR in ''|/|.|..|*/.|*/..) fail "$DIR" ;; esac
+DIR=${DIR%/}
+[ ! -L "$DIR" ] || fail "symlink $DIR"
+parent=$(cd -- "$(dirname -- "$DIR")" && pwd -P) || exit 1
+name=$(basename -- "$DIR")
+case $name in ''|.|..) fail "$DIR" ;; esac
+DIR="$parent/$name"
+script_dir=$(cd -- "$(dirname -- "$0")" && pwd -P) || exit 1
+cwd=$(pwd -P)
+home=$(cd -- "$HOME" && pwd -P) || exit 1
+for protected in "$cwd" "$script_dir" "$home"; do
+  case "$protected/" in "$DIR/"*) fail "protected directory $DIR" ;; esac
+done
+marker="$DIR/.mere-mortals-fixture"
+if [ -e "$DIR" ]; then
+  [ -d "$DIR" ] && [ ! -L "$marker" ] && [ -f "$marker" ] || fail "existing unowned target $DIR"
+  [ "$(cat -- "$marker")" = "finding-files-for-mere-mortals:v1" ] || fail "wrong ownership marker in $DIR"
+fi
+# Refuse overlapping builders. A failed build leaves an unowned directory,
+# which must be inspected manually rather than removed on the next run.
+lock="$DIR.build-lock"
+mkdir -- "$lock" 2>/dev/null || fail "build already active (or stale lock): $lock"
+trap 'rmdir -- "$lock"' EXIT
+trap 'exit 1' HUP INT TERM
+[ ! -e "$DIR" ] || rm -rf -- "$DIR"
 mkdir -p "$DIR"/archive "$DIR"/cache "$DIR"/photos/raw \
          "$DIR"/sizes "$DIR"/subdir "$DIR"/times "$DIR"/perms \
          "$DIR"/emptydir
@@ -94,3 +116,6 @@ ln -s notes.txt         "$DIR/link-good"
 ln -s no-such-file.txt  "$DIR/link-broken"
 
 echo "built $DIR"
+
+# Mark only a completed fixture tree as safe for this builder to replace.
+printf '%s\n' 'finding-files-for-mere-mortals:v1' > "$marker"

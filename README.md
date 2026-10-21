@@ -128,3 +128,14 @@ so you can start a chapter over. Keep the
 tree afterward: a filesystem with known
 answers is a standing rehearsal for the
 day a real one asks the same questions.
+
+## Fixture rebuild safety
+
+The fixture builder creates a new target directory. It replaces an existing
+target only when that directory carries this guide's completed-build ownership
+marker (`.mere-mortals-fixture`). Existing unmarked directories, symlink targets,
+protected home/current/script directories and overlapping builds are refused.
+Older fixture trees have no marker: use a fresh directory name and inspect the
+old tree manually. Do not add a marker to an unrelated directory. A failed or
+interrupted build may leave an unmarked tree or stale `.build-lock` directory;
+inspect it before cleaning up.
